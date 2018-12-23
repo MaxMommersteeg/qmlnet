@@ -37,6 +37,7 @@ namespace Qml.Net.Internal
             else
             {
                 pathResolver = new DynamicLinkLibraryPathResolver();
+                loader = PlatformLoaderBase.SelectPlatformLoader();
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
                     // This custom path resolver attempts to do a DllImport to get the path that .NET decides.
