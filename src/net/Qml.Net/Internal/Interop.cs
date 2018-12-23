@@ -18,7 +18,7 @@ namespace Qml.Net.Internal
         
         static Interop()
         {
-            Environment.SetEnvironmentVariable("LD_LIBRARY_PATH", "/home/pknopf/git/qmlnet/src/native/build-QmlNet-Desktop_Qt_5_12_0_GCC_64bit2-Debug");
+            //Environment.SetEnvironmentVariable("LD_LIBRARY_PATH", "/home/pknopf/git/qmlnet/src/native/build-QmlNet-Desktop_Qt_5_12_0_GCC_64bit2-Debug");
             
             string pluginsDirectory = null;
             string qmlDirectory = null;
@@ -132,6 +132,7 @@ namespace Qml.Net.Internal
                 NetTypeInfo = LoadInteropType<NetTypeInfoInterop>(lib, loader);
                 NetJsValue = LoadInteropType<NetJsValueInterop>(lib, loader);
                 NetMethodInfo = LoadInteropType<NetMethodInfoInterop>(lib, loader);
+                NetPropertyInfo = LoadInteropType<NetPropertyInfoInterop>(lib, loader);
             }
 
             var cb = DefaultCallbacks.Callbacks();
@@ -143,7 +144,6 @@ namespace Qml.Net.Internal
         internal interface ICombined :
         // ReSharper restore MemberCanBePrivate.Global
         // ReSharper restore PossibleInterfaceMemberAmbiguity
-            INetPropertyInfoInterop,
             INetTypeManagerInterop,
             IQGuiApplicationInterop,
             IQQmlApplicationEngine,
@@ -168,7 +168,7 @@ namespace Qml.Net.Internal
         
         public static NetMethodInfoInterop NetMethodInfo { get; }
         
-        public static INetPropertyInfoInterop NetPropertyInfo { get; }
+        public static NetPropertyInfoInterop NetPropertyInfo { get; }
         
         public static INetTypeManagerInterop NetTypeManager { get; }
         
