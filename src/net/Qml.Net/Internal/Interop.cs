@@ -125,7 +125,7 @@ namespace Qml.Net.Internal
             {
                 var pathLoader = new Platform.PathResolver.DynamicLinkLibraryPathResolver();
                 var path = pathLoader.Resolve("QmlNet");
-                var loader = new Platform.Loader.LinuxPlatformLoader();
+                var loader = Platform.Loader.PlatformLoaderBase.SelectPlatformLoader();
                 var lib = loader.LoadLibrary(path.Path);
 
                 Callbacks = LoadInteropType<CallbacksInterop>(lib, loader);
