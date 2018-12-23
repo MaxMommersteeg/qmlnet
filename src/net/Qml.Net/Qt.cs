@@ -25,13 +25,16 @@ namespace Qml.Net
         }
     }
 
-    internal interface IQtInterop
+    internal class QtInterop
     {
         [NativeSymbol(Entrypoint = "qt_putenv")]
-        bool PutEnv([MarshalAs(UnmanagedType.LPStr), CallerFree]string name, [MarshalAs(UnmanagedType.LPStr), CallerFree]string value);
+        public PutEnvDel PutEnv { get; set; }
+        public delegate bool PutEnvDel([MarshalAs(UnmanagedType.LPStr), CallerFree]string name, [MarshalAs(UnmanagedType.LPStr), CallerFree]string value);
         [NativeSymbol(Entrypoint = "qt_getenv")]
-        IntPtr GetEnv(string name);
+        public GetEnvDel GetEnv { get; set; }
+        public delegate IntPtr GetEnvDel(string name);
         [NativeSymbol(Entrypoint = "qt_version")]
-        IntPtr QtVersion();
+        public QtVersionDel QtVersion { get; set; }
+        public delegate IntPtr QtVersionDel();
     }
 }

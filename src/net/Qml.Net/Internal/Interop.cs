@@ -84,14 +84,6 @@ namespace Qml.Net.Internal
             
             var interop = builder.ActivateInterface<ICombined>("QmlNet");
 
-            NetVariantList = interop;
-            NetTestHelper = interop;
-            NetSignalInfo = interop;
-            QResource = interop;
-            NetDelegate = interop;
-            QQuickStyle = interop;
-            QtInterop = interop;
-            Utilities = interop;
             QtWebEngine = interop;
             
             if(!string.IsNullOrEmpty(pluginsDirectory))
@@ -132,6 +124,14 @@ namespace Qml.Net.Internal
                 QQmlApplicationEngine = LoadInteropType<QQmlApplicationEngineInterop>(lib, loader);
                 NetVariant = LoadInteropType<NetVariantInterop>(lib, loader);
                 NetReference = LoadInteropType<NetReferenceInterop>(lib, loader);
+                NetVariantList = LoadInteropType<NetVariantListInterop>(lib, loader);
+                NetTestHelper = LoadInteropType<NetTestHelperInterop>(lib, loader);
+                NetSignalInfo = LoadInteropType<NetSignalInfoInterop>(lib, loader);
+                QResource = LoadInteropType<QResourceInterop>(lib, loader);
+                NetDelegate = LoadInteropType<NetDelegateInterop>(lib, loader);
+                QQuickStyle = LoadInteropType<QQuickStyleInterop>(lib, loader);
+                QtInterop = LoadInteropType<QtInterop>(lib, loader);
+                Utilities = LoadInteropType<UtilitiesInterop>(lib, loader);
             }
 
             var cb = DefaultCallbacks.Callbacks();
@@ -143,14 +143,6 @@ namespace Qml.Net.Internal
         internal interface ICombined :
         // ReSharper restore MemberCanBePrivate.Global
         // ReSharper restore PossibleInterfaceMemberAmbiguity
-            INetVariantListInterop,
-            INetTestHelperInterop,
-            INetSignalInfoInterop,
-            IQResourceInterop,
-            INetDelegateInterop,
-            IQQuickStyleInterop,
-            IQtInterop,
-            IUtilities,
             IQtWebEngine
         {
 
@@ -174,23 +166,23 @@ namespace Qml.Net.Internal
         
         public static NetReferenceInterop NetReference { get; }
         
-        public static INetVariantListInterop NetVariantList { get; }
+        public static NetVariantListInterop NetVariantList { get; }
         
-        public static INetTestHelperInterop NetTestHelper { get; }
+        public static NetTestHelperInterop NetTestHelper { get; }
         
-        public static INetSignalInfoInterop NetSignalInfo { get; }
+        public static NetSignalInfoInterop NetSignalInfo { get; }
         
-        public static IQResourceInterop QResource { get; }
+        public static QResourceInterop QResource { get; }
         
-        public static INetDelegateInterop NetDelegate { get; }
+        public static NetDelegateInterop NetDelegate { get; }
         
         public static NetJsValueInterop NetJsValue { get; }
         
-        public static IQQuickStyleInterop QQuickStyle { get; }
+        public static QQuickStyleInterop QQuickStyle { get; }
 
-        public static IQtInterop QtInterop { get; }
+        public static QtInterop QtInterop { get; }
         
-        public static IUtilities Utilities { get; }
+        public static UtilitiesInterop Utilities { get; }
         
         public static IQtWebEngine QtWebEngine { get; }
 

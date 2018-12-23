@@ -16,11 +16,13 @@ namespace Qml.Net
         }
     }
     
-    internal interface IQResourceInterop
+    internal class QResourceInterop
     {
         [NativeSymbol(Entrypoint = "qresource_registerResource")]
-        bool RegisterResource([MarshalAs(UnmanagedType.LPWStr), CallerFree]string rccFileName, [MarshalAs(UnmanagedType.LPWStr), CallerFree]string resourceRoot);
+        public RegisterResourceDel RegisterResource { get; set; }
+        public delegate bool RegisterResourceDel([MarshalAs(UnmanagedType.LPWStr), CallerFree]string rccFileName, [MarshalAs(UnmanagedType.LPWStr), CallerFree]string resourceRoot);
         [NativeSymbol(Entrypoint = "qresource_unregisterResource")]
-        bool UnregisterResource([MarshalAs(UnmanagedType.LPWStr), CallerFree]string rccFileName, [MarshalAs(UnmanagedType.LPWStr), CallerFree]string resourceRoot);
+        public UnregisterResourceDel UnregisterResource { get; set; }
+        public delegate bool UnregisterResourceDel([MarshalAs(UnmanagedType.LPWStr), CallerFree]string rccFileName, [MarshalAs(UnmanagedType.LPWStr), CallerFree]string resourceRoot);
     }
 }

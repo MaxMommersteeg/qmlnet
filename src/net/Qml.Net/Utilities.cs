@@ -28,9 +28,10 @@ namespace Qml.Net
         } 
     }
     
-    internal interface IUtilities
+    internal class UtilitiesInterop
     {
         [NativeSymbol(Entrypoint = "freeString")]
-        void FreeString(IntPtr container);
+        public FreeStringDel FreeString { get; set; }
+        public delegate void FreeStringDel(IntPtr container);
     }
 }
