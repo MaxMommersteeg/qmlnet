@@ -23,7 +23,7 @@ namespace Qml.Net
 
             public IntPtr LoadSymbol(IntPtr library, string symbolName)
             {
-                return new IntPtr(1);
+                return GetExportedSymbol(symbolName);
             }
 
             public bool CloseLibrary(IntPtr library)
