@@ -84,7 +84,6 @@ namespace Qml.Net.Internal
             
             var interop = builder.ActivateInterface<ICombined>("QmlNet");
 
-            NetPropertyInfo = interop;
             NetTypeManager = interop;
             QGuiApplication = interop;
             QQmlApplicationEngine = interop;
