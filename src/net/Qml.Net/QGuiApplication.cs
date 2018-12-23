@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
-using AdvancedDLSupport;
 using Qml.Net.Internal;
 using Qml.Net.Internal.Qml;
 

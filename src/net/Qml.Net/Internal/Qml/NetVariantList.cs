@@ -1,5 +1,4 @@
 ﻿using System;
-using AdvancedDLSupport;
 
 namespace Qml.Net.Internal.Qml
 {

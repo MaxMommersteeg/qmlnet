@@ -1,9 +1,6 @@
-﻿using AdvancedDLSupport;
-using Qml.Net.Internal;
+﻿using Qml.Net.Internal;
 using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace Qml.Net
 {
@@ -29,7 +26,7 @@ namespace Qml.Net
     {
         [NativeSymbol(Entrypoint = "qt_putenv")]
         public PutEnvDel PutEnv { get; set; }
-        public delegate bool PutEnvDel([MarshalAs(UnmanagedType.LPStr), CallerFree]string name, [MarshalAs(UnmanagedType.LPStr), CallerFree]string value);
+        public delegate bool PutEnvDel([MarshalAs(UnmanagedType.LPStr)]string name, [MarshalAs(UnmanagedType.LPStr)]string value);
         [NativeSymbol(Entrypoint = "qt_getenv")]
         public GetEnvDel GetEnv { get; set; }
         public delegate IntPtr GetEnvDel(string name);

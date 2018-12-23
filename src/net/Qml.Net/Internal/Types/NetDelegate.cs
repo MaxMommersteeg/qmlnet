@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using AdvancedDLSupport;
 
 namespace Qml.Net.Internal.Types
 {

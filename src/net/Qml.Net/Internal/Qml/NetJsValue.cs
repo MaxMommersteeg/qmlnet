@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Dynamic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using AdvancedDLSupport;
 
 namespace Qml.Net.Internal.Qml
 {
@@ -212,7 +209,7 @@ namespace Qml.Net.Internal.Qml
         
         [NativeSymbol(Entrypoint = "net_js_value_getProperty")]
         public GetPropertyDel GetProperty { get; set; }
-        public delegate IntPtr GetPropertyDel(IntPtr jsValue, [MarshalAs(UnmanagedType.LPWStr), CallerFree] string propertyName);
+        public delegate IntPtr GetPropertyDel(IntPtr jsValue, [MarshalAs(UnmanagedType.LPWStr)] string propertyName);
         
         [NativeSymbol(Entrypoint = "net_js_value_getItemAtIndex")]
         public GetItemAtIndexDel GetItemAtIndex { get; set; }

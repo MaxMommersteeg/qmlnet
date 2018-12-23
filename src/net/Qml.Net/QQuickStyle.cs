@@ -1,5 +1,4 @@
 ﻿using System.Runtime.InteropServices;
-using AdvancedDLSupport;
 using Qml.Net.Internal;
 
 namespace Qml.Net
@@ -21,10 +20,10 @@ namespace Qml.Net
     {
         [NativeSymbol(Entrypoint = "qquickstyle_setFallbackStyle")]
         public SetFallbackStyleDel SetFallbackStyle { get; set; }
-        public delegate void SetFallbackStyleDel([MarshalAs(UnmanagedType.LPWStr), CallerFree]string style);
+        public delegate void SetFallbackStyleDel([MarshalAs(UnmanagedType.LPWStr)]string style);
 
         [NativeSymbol(Entrypoint = "qquickstyle_setStyle")]
         public SetStyleDel SetStyle { get; set; }
-        public delegate void SetStyleDel([MarshalAs(UnmanagedType.LPWStr), CallerFree]string style);
+        public delegate void SetStyleDel([MarshalAs(UnmanagedType.LPWStr)]string style);
     }
 }

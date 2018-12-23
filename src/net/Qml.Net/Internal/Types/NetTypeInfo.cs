@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using AdvancedDLSupport;
-using Qml.Net.Internal;
 
 namespace Qml.Net.Internal.Types
 {
@@ -123,7 +121,7 @@ namespace Qml.Net.Internal.Types
     {
         [NativeSymbol(Entrypoint = "type_info_create")]
         public CreateDel Create { get; set; }
-        public delegate IntPtr CreateDel([MarshalAs(UnmanagedType.LPWStr), CallerFree]string fullTypeName);
+        public delegate IntPtr CreateDel([MarshalAs(UnmanagedType.LPWStr)]string fullTypeName);
         
         [NativeSymbol(Entrypoint = "type_info_destroy")]
         public DestroyDel Destroy { get; set; }
@@ -135,7 +133,7 @@ namespace Qml.Net.Internal.Types
         
         [NativeSymbol(Entrypoint = "type_info_setClassName")]
         public SetClassNameDel SetClassName { get; set; }
-        public delegate void SetClassNameDel(IntPtr netTypeInfo, [MarshalAs(UnmanagedType.LPWStr), CallerFree]string className);
+        public delegate void SetClassNameDel(IntPtr netTypeInfo, [MarshalAs(UnmanagedType.LPWStr)]string className);
         
         [NativeSymbol(Entrypoint = "type_info_getClassName")]
         public GetClassNameDel GetClassName { get; set; }

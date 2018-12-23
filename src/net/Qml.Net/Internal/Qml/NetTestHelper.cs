@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using AdvancedDLSupport;
 
 namespace Qml.Net.Internal.Qml
 {
@@ -16,6 +15,6 @@ namespace Qml.Net.Internal.Qml
     {
         [NativeSymbol(Entrypoint = "net_test_helper_runQml")]
         public RunQmlDel RunQml { get; set; }
-        public delegate void RunQmlDel(IntPtr qmlEngine, [MarshalAs(UnmanagedType.LPWStr), CallerFree]string qml);
+        public delegate void RunQmlDel(IntPtr qmlEngine, [MarshalAs(UnmanagedType.LPWStr)]string qml);
     }
 }

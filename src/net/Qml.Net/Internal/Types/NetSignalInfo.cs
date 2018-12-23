@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using AdvancedDLSupport;
-using Qml.Net.Internal;
 
 namespace Qml.Net.Internal.Types
 {
@@ -45,7 +43,7 @@ namespace Qml.Net.Internal.Types
     {
         [NativeSymbol(Entrypoint = "signal_info_create")]
         public CreateDel Create { get; set; }
-        public delegate IntPtr CreateDel(IntPtr parentType, [MarshalAs(UnmanagedType.LPWStr), CallerFree] string name);
+        public delegate IntPtr CreateDel(IntPtr parentType, [MarshalAs(UnmanagedType.LPWStr)] string name);
         [NativeSymbol(Entrypoint = "signal_info_destroy")]
         public DestroyDel Destroy { get; set; }
         public delegate void DestroyDel(IntPtr signal);

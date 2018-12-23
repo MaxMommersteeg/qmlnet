@@ -1,14 +1,14 @@
 using System;
 using System.Linq;
 using System.Runtime.InteropServices;
-using AdvancedDLSupport;
-using AdvancedDLSupport.Loaders;
+using NetNativeLibLoader.Loader;
+using NetNativeLibLoader.PathResolver;
 
 namespace Qml.Net
 {
     public static class Host
     {
-        internal class Loader : IPlatformLoader, ILibraryPathResolver
+        internal class Loader : IPlatformLoader, IPathResolver
         {
             public T LoadFunction<T>(IntPtr library, string symbolName)
             {

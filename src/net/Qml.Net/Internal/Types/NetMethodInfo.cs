@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using AdvancedDLSupport;
 using Qml.Net.Internal;
 
 namespace Qml.Net.Internal.Types
@@ -121,7 +120,7 @@ namespace Qml.Net.Internal.Types
         
         [NativeSymbol(Entrypoint = "method_info_create")]
         public CreateDel Create { get; set; }
-        public delegate IntPtr CreateDel(IntPtr parentTypeInfo, [MarshalAs(UnmanagedType.LPWStr), CallerFree]string methodName, IntPtr returnTypeInfo, bool isStatic);
+        public delegate IntPtr CreateDel(IntPtr parentTypeInfo, [MarshalAs(UnmanagedType.LPWStr)]string methodName, IntPtr returnTypeInfo, bool isStatic);
         
         [NativeSymbol(Entrypoint = "method_info_destroy")]
         public DestroyDel Destroy { get; set; }
@@ -141,7 +140,7 @@ namespace Qml.Net.Internal.Types
         
         [NativeSymbol(Entrypoint = "method_info_addParameter")]
         public AddParameterDel AddParameter { get; set; }
-        public delegate void AddParameterDel(IntPtr method, [MarshalAs(UnmanagedType.LPWStr), CallerFree]string name, IntPtr type);
+        public delegate void AddParameterDel(IntPtr method, [MarshalAs(UnmanagedType.LPWStr)]string name, IntPtr type);
         
         [NativeSymbol(Entrypoint = "method_info_getParameterCount")]
         public GetParameterCountDel GetParameterCount { get; set; }

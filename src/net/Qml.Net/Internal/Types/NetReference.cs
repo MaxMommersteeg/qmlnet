@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Runtime.Serialization;
-using AdvancedDLSupport;
 using Qml.Net.Internal;
 using Qml.Net.Internal.Qml;
 
@@ -124,7 +121,7 @@ namespace Qml.Net.Internal.Types
         
         [NativeSymbol(Entrypoint = "net_instance_activateSignal")]
         public ActivateSignalDel ActivateSignal { get; set; }
-        public delegate bool ActivateSignalDel(IntPtr instance, [MarshalAs(UnmanagedType.LPWStr), CallerFree]string signalName, IntPtr variants);
+        public delegate bool ActivateSignalDel(IntPtr instance, [MarshalAs(UnmanagedType.LPWStr)]string signalName, IntPtr variants);
     }
 
     internal static class ObjectIdReferenceTracker

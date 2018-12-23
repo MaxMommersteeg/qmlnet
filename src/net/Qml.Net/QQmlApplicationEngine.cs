@@ -1,6 +1,5 @@
 using System;
 using System.Runtime.InteropServices;
-using AdvancedDLSupport;
 using Qml.Net.Internal;
 using Qml.Net.Internal.Behaviors;
 using Qml.Net.Internal.Qml;
@@ -114,27 +113,27 @@ namespace Qml.Net
 
         [NativeSymbol(Entrypoint = "qqmlapplicationengine_load")]
         public LoadDel Load { get; set; }
-        public delegate int LoadDel(IntPtr engine, [MarshalAs(UnmanagedType.LPWStr), CallerFree]string path);
+        public delegate int LoadDel(IntPtr engine, [MarshalAs(UnmanagedType.LPWStr)]string path);
 
         [NativeSymbol(Entrypoint = "qqmlapplicationengine_loadData")]
         public LoadDataDel LoadData { get; set; }
-        public delegate int LoadDataDel(IntPtr engine, [MarshalAs(UnmanagedType.LPWStr), CallerFree]string path);
+        public delegate int LoadDataDel(IntPtr engine, [MarshalAs(UnmanagedType.LPWStr)]string path);
 
         [NativeSymbol(Entrypoint = "qqmlapplicationengine_registerType")]
         public RegisterTypeDel RegisterType { get; set; }
-        public delegate int RegisterTypeDel(IntPtr type, [MarshalAs(UnmanagedType.LPWStr), CallerFree]string uri, int versionMajor, int versionMinor, [MarshalAs(UnmanagedType.LPWStr), CallerFree]string qmlName);
+        public delegate int RegisterTypeDel(IntPtr type, [MarshalAs(UnmanagedType.LPWStr)]string uri, int versionMajor, int versionMinor, [MarshalAs(UnmanagedType.LPWStr)]string qmlName);
         
         [NativeSymbol(Entrypoint = "qqmlapplicationengine_registerSingletonTypeQml")]
         public RegisterSingletonTypeQmlDel RegisterSingletonTypeQml { get; set; }
-        public delegate int RegisterSingletonTypeQmlDel([MarshalAs(UnmanagedType.LPWStr), CallerFree]string url, [MarshalAs(UnmanagedType.LPWStr), CallerFree]string uri, int versionMajor, int versionMinor, [MarshalAs(UnmanagedType.LPWStr), CallerFree]string qmlName);
+        public delegate int RegisterSingletonTypeQmlDel([MarshalAs(UnmanagedType.LPWStr)]string url, [MarshalAs(UnmanagedType.LPWStr)]string uri, int versionMajor, int versionMinor, [MarshalAs(UnmanagedType.LPWStr)]string qmlName);
 
         [NativeSymbol(Entrypoint = "qqmlapplicationengine_registerSingletonTypeNet")]
         public RegisterSingletonTypeNetDel RegisterSingletonTypeNet { get; set; }
-        public delegate int RegisterSingletonTypeNetDel(IntPtr type, [MarshalAs(UnmanagedType.LPWStr), CallerFree]string uri, int versionMajor, int versionMinor, [MarshalAs(UnmanagedType.LPWStr), CallerFree]string typeName);
+        public delegate int RegisterSingletonTypeNetDel(IntPtr type, [MarshalAs(UnmanagedType.LPWStr)]string uri, int versionMajor, int versionMinor, [MarshalAs(UnmanagedType.LPWStr)]string typeName);
 
         [NativeSymbol(Entrypoint = "qqmlapplicationengine_addImportPath")]
         public AddImportPathDel AddImportPath { get; set; }
-        public delegate void AddImportPathDel(IntPtr engine, [MarshalAs(UnmanagedType.LPWStr), CallerFree]string path);
+        public delegate void AddImportPathDel(IntPtr engine, [MarshalAs(UnmanagedType.LPWStr)]string path);
         
         [NativeSymbol(Entrypoint = "qqmlapplicationengine_internalPointer")]
         public InternalPointerDel InternalPointer { get; set; }
@@ -142,10 +141,10 @@ namespace Qml.Net
         
         [NativeSymbol(Entrypoint = "qqmlapplicationengine_getContextProperty")]
         public GetContextPropertyDel GetContextProperty { get; set; }
-        public delegate IntPtr GetContextPropertyDel(IntPtr app, [MarshalAs(UnmanagedType.LPWStr), CallerFree]string name);
+        public delegate IntPtr GetContextPropertyDel(IntPtr app, [MarshalAs(UnmanagedType.LPWStr)]string name);
         
         [NativeSymbol(Entrypoint = "qqmlapplicationengine_setContextProperty")]
         public SetContextPropertyDel SetContextProperty { get; set; }
-        public delegate void SetContextPropertyDel(IntPtr app, [MarshalAs(UnmanagedType.LPWStr), CallerFree]string path, IntPtr value);
+        public delegate void SetContextPropertyDel(IntPtr app, [MarshalAs(UnmanagedType.LPWStr)]string path, IntPtr value);
     }
 }

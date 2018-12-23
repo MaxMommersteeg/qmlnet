@@ -4,7 +4,8 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using AdvancedDLSupport;
+using NetNativeLibLoader.Loader;
+using NetNativeLibLoader.PathResolver;
 using Qml.Net.Internal.Qml;
 using Qml.Net.Internal.Types;
 
@@ -24,64 +25,97 @@ namespace Qml.Net.Internal
             string qmlDirectory = null;
             string libDirectory = null;
 
-            ILibraryPathResolver pathResolver = null;
+            IPathResolver pathResolver = null;
+            IPlatformLoader loader = null;
             
             if (Host.GetExportedSymbol != null)
             {
                 // We are loading exported functions from the currently running executable.
-                var member = (FieldInfo)typeof(NativeLibraryBase).GetMember("PlatformLoader", BindingFlags.Static | BindingFlags.NonPublic).First();
-                member.SetValue(null, new Host.Loader());
                 pathResolver = new Host.Loader();
+                loader = new Host.Loader();
             }
             else
             {
-                var internalType = Type.GetType("AdvancedDLSupport.DynamicLinkLibraryPathResolver, AdvancedDLSupport");
-                if (internalType != null)
+                pathResolver = new DynamicLinkLibraryPathResolver();
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    pathResolver = (ILibraryPathResolver) Activator.CreateInstance(internalType, new object[] {true});
+                    // This custom path resolver attempts to do a DllImport to get the path that .NET decides.
+                    // It may load a special dll from a NuGet package.
+                    pathResolver = new WindowsDllImportLibraryPathResolver(pathResolver);
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                {
+                    pathResolver = new MacDllImportLibraryPathResolver(pathResolver);
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    pathResolver = new LinuxDllImportLibraryPathResolver(pathResolver);
+                }
 
-                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                    {
-                        // This custom path resolver attempts to do a DllImport to get the path that .NET decides.
-                        // It may load a special dll from a NuGet package.
-                        pathResolver = new WindowsDllImportLibraryPathResolver(pathResolver);
-                    }
-                    else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                    {
-                        pathResolver = new MacDllImportLibraryPathResolver(pathResolver);
-                    }
-                    else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                    {
-                        pathResolver = new LinuxDllImportLibraryPathResolver(pathResolver);
-                    }
+                var resolveResult = pathResolver.Resolve("QmlNet");
 
-                    var resolveResult = pathResolver.Resolve("QmlNet");
-
-                    if (resolveResult.IsSuccess)
+                if (resolveResult.IsSuccess)
+                {
+                    libDirectory = Path.GetDirectoryName(resolveResult.Path);
+                    if (!string.IsNullOrEmpty(libDirectory))
                     {
-                        libDirectory = Path.GetDirectoryName(resolveResult.Path);
-                        if (!string.IsNullOrEmpty(libDirectory))
+                        // If this library has a plugins/qml directory below it, set it.
+                        var potentialPlugisDirectory = Path.Combine(libDirectory, "plugins");
+                        if (Directory.Exists(potentialPlugisDirectory))
                         {
-                            // If this library has a plugins/qml directory below it, set it.
-                            var potentialPlugisDirectory = Path.Combine(libDirectory, "plugins");
-                            if (Directory.Exists(potentialPlugisDirectory))
-                            {
-                                pluginsDirectory = potentialPlugisDirectory;
-                            }
-
-                            var potentialQmlDirectory = Path.Combine(libDirectory, "qml");
-                            if (Directory.Exists(potentialQmlDirectory))
-                            {
-                                qmlDirectory = potentialQmlDirectory;
-                            }
+                            pluginsDirectory = potentialPlugisDirectory;
                         }
+
+                        var potentialQmlDirectory = Path.Combine(libDirectory, "qml");
+                        if (Directory.Exists(potentialQmlDirectory))
+                        {
+                            qmlDirectory = potentialQmlDirectory;
+                        }
+                    }
+                }
+                
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    if (!string.IsNullOrEmpty(libDirectory) && Directory.Exists(libDirectory))
+                    {
+                        // Even though we opened up the native dll correctly, we need to add
+                        // the folder to the path. The reason is because QML plugins aren't
+                        // in the same directory and have trouble finding dependencies
+                        // that are within our lib folder.
+                        Environment.SetEnvironmentVariable("PATH",
+                            Environment.GetEnvironmentVariable("PATH") + $";{libDirectory}");
                     }
                 }
             }
 
+            var result = pathResolver.Resolve("QmlNet");
 
-            var builder = new NativeLibraryBuilder(pathResolver: pathResolver);
-            
+            if (!result.IsSuccess)
+            {
+                throw new Exception("Couldn't find the native Qml.Net library.");
+            }
+
+            var library = loader.LoadLibrary(result.Path);
+            Callbacks = LoadInteropType<CallbacksInterop>(library, loader);
+            NetTypeInfo = LoadInteropType<NetTypeInfoInterop>(library, loader);
+            NetJsValue = LoadInteropType<NetJsValueInterop>(library, loader);
+            NetMethodInfo = LoadInteropType<NetMethodInfoInterop>(library, loader);
+            NetPropertyInfo = LoadInteropType<NetPropertyInfoInterop>(library, loader);
+            NetTypeManager = LoadInteropType<NetTypeManagerInterop>(library, loader);
+            QGuiApplication = LoadInteropType<QGuiApplicationInterop>(library, loader);
+            QQmlApplicationEngine = LoadInteropType<QQmlApplicationEngineInterop>(library, loader);
+            NetVariant = LoadInteropType<NetVariantInterop>(library, loader);
+            NetReference = LoadInteropType<NetReferenceInterop>(library, loader);
+            NetVariantList = LoadInteropType<NetVariantListInterop>(library, loader);
+            NetTestHelper = LoadInteropType<NetTestHelperInterop>(library, loader);
+            NetSignalInfo = LoadInteropType<NetSignalInfoInterop>(library, loader);
+            QResource = LoadInteropType<QResourceInterop>(library, loader);
+            NetDelegate = LoadInteropType<NetDelegateInterop>(library, loader);
+            QQuickStyle = LoadInteropType<QQuickStyleInterop>(library, loader);
+            QtInterop = LoadInteropType<QtInterop>(library, loader);
+            Utilities = LoadInteropType<UtilitiesInterop>(library, loader);
+            QtWebEngine = LoadInteropType<QtWebEngineInterop>(library, loader);
+
             if(!string.IsNullOrEmpty(pluginsDirectory))
             {
                 Qt.PutEnv("QT_PLUGIN_PATH", pluginsDirectory);
@@ -89,46 +123,6 @@ namespace Qml.Net.Internal
             if(!string.IsNullOrEmpty(qmlDirectory))
             {
                 Qt.PutEnv("QML2_IMPORT_PATH", qmlDirectory);
-            }
-
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                if (!string.IsNullOrEmpty(libDirectory) && Directory.Exists(libDirectory))
-                {
-                    // Even though we opened up the native dll correctly, we need to add
-                    // the folder to the path. The reason is because QML plugins aren't
-                    // in the same directory and have trouble finding dependencies
-                    // that are within our lib folder.
-                    Environment.SetEnvironmentVariable("PATH",
-                        Environment.GetEnvironmentVariable("PATH") + $";{libDirectory}");
-                }
-            }
-
-            {
-                var pathLoader = new Platform.PathResolver.DynamicLinkLibraryPathResolver();
-                var path = pathLoader.Resolve("QmlNet");
-                var loader = Platform.Loader.PlatformLoaderBase.SelectPlatformLoader();
-                var lib = loader.LoadLibrary(path.Path);
-
-                Callbacks = LoadInteropType<CallbacksInterop>(lib, loader);
-                NetTypeInfo = LoadInteropType<NetTypeInfoInterop>(lib, loader);
-                NetJsValue = LoadInteropType<NetJsValueInterop>(lib, loader);
-                NetMethodInfo = LoadInteropType<NetMethodInfoInterop>(lib, loader);
-                NetPropertyInfo = LoadInteropType<NetPropertyInfoInterop>(lib, loader);
-                NetTypeManager = LoadInteropType<NetTypeManagerInterop>(lib, loader);
-                QGuiApplication = LoadInteropType<QGuiApplicationInterop>(lib, loader);
-                QQmlApplicationEngine = LoadInteropType<QQmlApplicationEngineInterop>(lib, loader);
-                NetVariant = LoadInteropType<NetVariantInterop>(lib, loader);
-                NetReference = LoadInteropType<NetReferenceInterop>(lib, loader);
-                NetVariantList = LoadInteropType<NetVariantListInterop>(lib, loader);
-                NetTestHelper = LoadInteropType<NetTestHelperInterop>(lib, loader);
-                NetSignalInfo = LoadInteropType<NetSignalInfoInterop>(lib, loader);
-                QResource = LoadInteropType<QResourceInterop>(lib, loader);
-                NetDelegate = LoadInteropType<NetDelegateInterop>(lib, loader);
-                QQuickStyle = LoadInteropType<QQuickStyleInterop>(lib, loader);
-                QtInterop = LoadInteropType<QtInterop>(lib, loader);
-                Utilities = LoadInteropType<UtilitiesInterop>(lib, loader);
-                QtWebEngine = LoadInteropType<QtWebEngineInterop>(lib, loader);
             }
 
             var cb = DefaultCallbacks.Callbacks();
@@ -173,14 +167,14 @@ namespace Qml.Net.Internal
         
         public static QtWebEngineInterop QtWebEngine { get; }
 
-        private static T LoadInteropType<T>(IntPtr library, Platform.Loader.IPlatformLoader loader) where T:new()
+        private static T LoadInteropType<T>(IntPtr library, NetNativeLibLoader.Loader.IPlatformLoader loader) where T:new()
         {
             var result = new T();
             LoadDelegates(result, library, loader);
             return result;
         }
         
-        private static void LoadDelegates(object o, IntPtr library, Platform.Loader.IPlatformLoader loader)
+        private static void LoadDelegates(object o, IntPtr library, NetNativeLibLoader.Loader.IPlatformLoader loader)
         {
             foreach (var property in o.GetType().GetProperties())
             {

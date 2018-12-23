@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using AdvancedDLSupport;
 using Qml.Net.Internal;
 
 namespace Qml.Net.Internal.Types
@@ -78,7 +77,7 @@ namespace Qml.Net.Internal.Types
         [NativeSymbol(Entrypoint = "property_info_create")]
         public CreateDel Create { get; set; }
         public delegate  IntPtr CreateDel(IntPtr parentType,
-            [MarshalAs(UnmanagedType.LPWStr), CallerFree]string methodName,
+            [MarshalAs(UnmanagedType.LPWStr)]string methodName,
             IntPtr returnType,
             bool canRead,
             bool canWrite,

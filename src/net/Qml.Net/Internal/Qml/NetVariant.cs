@@ -1,6 +1,5 @@
 using System;
 using System.Runtime.InteropServices;
-using AdvancedDLSupport;
 using Qml.Net.Internal.Types;
 
 namespace Qml.Net.Internal.Qml
@@ -227,7 +226,7 @@ namespace Qml.Net.Internal.Qml
         
         [NativeSymbol(Entrypoint = "net_variant_setString")]
         public SetStringDel SetString { get; set; }
-        public delegate void SetStringDel(IntPtr variant, [MarshalAs(UnmanagedType.LPWStr), CallerFree]string value);
+        public delegate void SetStringDel(IntPtr variant, [MarshalAs(UnmanagedType.LPWStr)]string value);
         [NativeSymbol(Entrypoint = "net_variant_getString")]
         public GetStringDel GetString { get; set; }
         public delegate IntPtr GetStringDel(IntPtr variant);

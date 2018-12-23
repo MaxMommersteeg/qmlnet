@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using AdvancedDLSupport;
 
 namespace Qml.Net.Internal.Types
 {
@@ -31,7 +30,7 @@ namespace Qml.Net.Internal.Types
 
         [NativeSymbol(Entrypoint = "type_info_callbacks_isTypeValid")]
         public IsTypeValidDel IsTypeValid { get; set; }
-        public delegate bool IsTypeValidDel([MarshalAs(UnmanagedType.LPWStr), CallerFree]string typeName);
+        public delegate bool IsTypeValidDel([MarshalAs(UnmanagedType.LPWStr)]string typeName);
 
         [NativeSymbol(Entrypoint = "type_info_callbacks_releaseNetReferenceGCHandle")]
         public ReleaseNetReferenceDel ReleaseNetReference { get; set; }
