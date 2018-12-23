@@ -84,7 +84,6 @@ namespace Qml.Net.Internal
             
             var interop = builder.ActivateInterface<ICombined>("QmlNet");
 
-            NetReference = interop;
             NetVariantList = interop;
             NetTestHelper = interop;
             NetSignalInfo = interop;
@@ -132,6 +131,7 @@ namespace Qml.Net.Internal
                 QGuiApplication = LoadInteropType<QGuiApplicationInterop>(lib, loader);
                 QQmlApplicationEngine = LoadInteropType<QQmlApplicationEngineInterop>(lib, loader);
                 NetVariant = LoadInteropType<NetVariantInterop>(lib, loader);
+                NetReference = LoadInteropType<NetReferenceInterop>(lib, loader);
             }
 
             var cb = DefaultCallbacks.Callbacks();
@@ -143,7 +143,6 @@ namespace Qml.Net.Internal
         internal interface ICombined :
         // ReSharper restore MemberCanBePrivate.Global
         // ReSharper restore PossibleInterfaceMemberAmbiguity
-            INetReferenceInterop,
             INetVariantListInterop,
             INetTestHelperInterop,
             INetSignalInfoInterop,
@@ -173,7 +172,7 @@ namespace Qml.Net.Internal
         
         public static NetVariantInterop NetVariant { get; }
         
-        public static INetReferenceInterop NetReference { get; }
+        public static NetReferenceInterop NetReference { get; }
         
         public static INetVariantListInterop NetVariantList { get; }
         
