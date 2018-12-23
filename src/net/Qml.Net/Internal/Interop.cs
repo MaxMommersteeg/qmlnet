@@ -82,10 +82,6 @@ namespace Qml.Net.Internal
 
             var builder = new NativeLibraryBuilder(pathResolver: pathResolver);
             
-            var interop = builder.ActivateInterface<ICombined>("QmlNet");
-
-            QtWebEngine = interop;
-            
             if(!string.IsNullOrEmpty(pluginsDirectory))
             {
                 Qt.PutEnv("QT_PLUGIN_PATH", pluginsDirectory);
@@ -132,22 +128,13 @@ namespace Qml.Net.Internal
                 QQuickStyle = LoadInteropType<QQuickStyleInterop>(lib, loader);
                 QtInterop = LoadInteropType<QtInterop>(lib, loader);
                 Utilities = LoadInteropType<UtilitiesInterop>(lib, loader);
+                QtWebEngine = LoadInteropType<QtWebEngineInterop>(lib, loader);
             }
 
             var cb = DefaultCallbacks.Callbacks();
             Callbacks.RegisterCallbacks(ref cb);
         }
 
-        // ReSharper disable PossibleInterfaceMemberAmbiguity
-        // ReSharper disable MemberCanBePrivate.Global
-        internal interface ICombined :
-        // ReSharper restore MemberCanBePrivate.Global
-        // ReSharper restore PossibleInterfaceMemberAmbiguity
-            IQtWebEngine
-        {
-
-        }
-        
         public static CallbacksInterop Callbacks { get; }
 
         public static NetTypeInfoInterop NetTypeInfo { get; }
@@ -184,7 +171,7 @@ namespace Qml.Net.Internal
         
         public static UtilitiesInterop Utilities { get; }
         
-        public static IQtWebEngine QtWebEngine { get; }
+        public static QtWebEngineInterop QtWebEngine { get; }
 
         private static T LoadInteropType<T>(IntPtr library, Platform.Loader.IPlatformLoader loader) where T:new()
         {
