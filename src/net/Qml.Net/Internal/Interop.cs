@@ -84,7 +84,6 @@ namespace Qml.Net.Internal
             
             var interop = builder.ActivateInterface<ICombined>("QmlNet");
 
-            NetMethodInfo = interop;
             NetPropertyInfo = interop;
             NetTypeManager = interop;
             QGuiApplication = interop;
@@ -132,6 +131,7 @@ namespace Qml.Net.Internal
                 Callbacks = LoadInteropType<CallbacksInterop>(lib, loader);
                 NetTypeInfo = LoadInteropType<NetTypeInfoInterop>(lib, loader);
                 NetJsValue = LoadInteropType<NetJsValueInterop>(lib, loader);
+                NetMethodInfo = LoadInteropType<NetMethodInfoInterop>(lib, loader);
             }
 
             var cb = DefaultCallbacks.Callbacks();
@@ -143,7 +143,6 @@ namespace Qml.Net.Internal
         internal interface ICombined :
         // ReSharper restore MemberCanBePrivate.Global
         // ReSharper restore PossibleInterfaceMemberAmbiguity
-            INetMethodInfoInterop,
             INetPropertyInfoInterop,
             INetTypeManagerInterop,
             IQGuiApplicationInterop,
@@ -167,7 +166,7 @@ namespace Qml.Net.Internal
 
         public static NetTypeInfoInterop NetTypeInfo { get; }
         
-        public static INetMethodInfoInterop NetMethodInfo { get; }
+        public static NetMethodInfoInterop NetMethodInfo { get; }
         
         public static INetPropertyInfoInterop NetPropertyInfo { get; }
         
