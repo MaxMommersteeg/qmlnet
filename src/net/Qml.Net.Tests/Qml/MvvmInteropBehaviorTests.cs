@@ -173,51 +173,6 @@ namespace Qml.Net.Tests.Qml
 
             Instance.TestResult.Should().Be(true);
         }
-
-        [Fact]
-        public void Does_unregister_signal_on_ref_destroy()
-        {
-            qmlApplicationEngine.LoadData(@"
-                import QtQuick 2.0
-                import tests 1.0
-                import testContext 1.0
-
-                Item {
-                    TestContext {
-                        id: tc
-                    }
-
-                    Timer {
-                        id: checkAndQuitTimer
-                        running: false
-                        interval: 1000
-			            onTriggered: {
-                            viewModelContainer.testResult = true;
-                            viewModelContainer.changeStringPropertyTo('new value')
-                            tc.quit()
-			            }
-                    }
-
-                    ViewModelContainer {
-                        id: viewModelContainer
-                        Component.onCompleted: function() {
-                            var vm = viewModelContainer.viewModel
-                            vm.stringPropertyChanged.connect(function() {
-                                viewModelContainer.testResult = false
-                            })
-                            vm = null
-                            gc()
-
-                            checkAndQuitTimer.running = true
-                        }
-                    }
-                }
-            ");
-
-            ExecApplicationWithTimeout(3000).Should().Be(0);
-
-            Instance.TestResult.Should().Be(true);
-        }
         
         [Fact]
         public void Does_play_nicely_with_completely_custom_notify_signals()

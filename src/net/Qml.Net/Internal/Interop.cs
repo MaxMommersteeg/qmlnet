@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -82,7 +82,6 @@ namespace Qml.Net.Internal
             
             var interop = builder.ActivateInterface<ICombined>("QmlNet");
 
-            Callbacks = interop;
             NetTypeInfo = interop;
             NetMethodInfo = interop;
             NetPropertyInfo = interop;
@@ -96,7 +95,6 @@ namespace Qml.Net.Internal
             NetSignalInfo = interop;
             QResource = interop;
             NetDelegate = interop;
-            NetJsValue = interop;
             QQuickStyle = interop;
             QtInterop = interop;
             Utilities = interop;
@@ -124,6 +122,16 @@ namespace Qml.Net.Internal
                 }
             }
 
+            {
+                var pathLoader = new Platform.PathResolver.DynamicLinkLibraryPathResolver();
+                var path = pathLoader.Resolve("QmlNet");
+                var loader = new Platform.Loader.LinuxPlatformLoader();
+                var lib = loader.LoadLibrary(path.Path);
+
+                Callbacks = LoadInteropType<CallbacksInterop>(lib, loader);
+                NetJsValue = LoadInteropType<NetJsValueInterop>(lib, loader);
+            }
+
             var cb = DefaultCallbacks.Callbacks();
             Callbacks.RegisterCallbacks(ref cb);
         }
@@ -133,7 +141,6 @@ namespace Qml.Net.Internal
         internal interface ICombined :
         // ReSharper restore MemberCanBePrivate.Global
         // ReSharper restore PossibleInterfaceMemberAmbiguity
-            ICallbacksIterop,
             INetTypeInfoInterop,
             INetMethodInfoInterop,
             INetPropertyInfoInterop,
@@ -147,7 +154,6 @@ namespace Qml.Net.Internal
             INetSignalInfoInterop,
             IQResourceInterop,
             INetDelegateInterop,
-            INetJsValueInterop,
             IQQuickStyleInterop,
             IQtInterop,
             IUtilities,
@@ -156,7 +162,7 @@ namespace Qml.Net.Internal
 
         }
         
-        public static ICallbacksIterop Callbacks { get; }
+        public static CallbacksInterop Callbacks { get; }
 
         public static INetTypeInfoInterop NetTypeInfo { get; }
         
@@ -184,7 +190,7 @@ namespace Qml.Net.Internal
         
         public static INetDelegateInterop NetDelegate { get; }
         
-        public static INetJsValueInterop NetJsValue { get; }
+        public static NetJsValueInterop NetJsValue { get; }
         
         public static IQQuickStyleInterop QQuickStyle { get; }
 
@@ -193,5 +199,22 @@ namespace Qml.Net.Internal
         public static IUtilities Utilities { get; }
         
         public static IQtWebEngine QtWebEngine { get; }
+
+        private static T LoadInteropType<T>(IntPtr library, Platform.Loader.IPlatformLoader loader) where T:new()
+        {
+            var result = new T();
+            LoadDelegates(result, library, loader);
+            return result;
+        }
+        
+        private static void LoadDelegates(object o, IntPtr library, Platform.Loader.IPlatformLoader loader)
+        {
+            foreach (var property in o.GetType().GetProperties())
+            {
+                var entryName = property.GetCustomAttributes().OfType<NativeSymbolAttribute>().First().Entrypoint;
+                var symbol = loader.LoadSymbol(library, entryName);
+                property.SetValue(o, Marshal.GetDelegateForFunctionPointer(symbol, property.PropertyType));
+            }
+        }
     }
 }
