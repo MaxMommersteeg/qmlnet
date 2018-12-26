@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
@@ -26,26 +26,32 @@ namespace Qml.Net.Internal.Types
     {
         [NativeSymbol(Entrypoint = "type_info_callbacks_registerCallbacks")]
         public RegisterCallbacksDel RegisterCallbacks { get; set; }
+
         public delegate void RegisterCallbacksDel(ref Callbacks callbacks);
 
         [NativeSymbol(Entrypoint = "type_info_callbacks_isTypeValid")]
         public IsTypeValidDel IsTypeValid { get; set; }
+
         public delegate bool IsTypeValidDel([MarshalAs(UnmanagedType.LPWStr)]string typeName);
 
         [NativeSymbol(Entrypoint = "type_info_callbacks_releaseNetReferenceGCHandle")]
         public ReleaseNetReferenceDel ReleaseNetReference { get; set; }
+
         public delegate void ReleaseNetReferenceDel(UInt64 objectId);
 
         [NativeSymbol(Entrypoint = "type_info_callbacks_releaseNetDelegateGCHandle")]
         public ReleaseNetDelegateGCHandleDel ReleaseNetDelegateGCHandle { get; set; }
+
         public delegate void ReleaseNetDelegateGCHandleDel(IntPtr handle);
-        
+
         [NativeSymbol(Entrypoint = "type_info_callbacks_instantiateType")]
         public InstantiateTypeDel InstantiateType { get; set; }
+
         public delegate IntPtr InstantiateTypeDel(IntPtr type);
-        
+
         [NativeSymbol(Entrypoint = "type_info_callbacks_invokeMethod")]
         public InvokeMethodDel InvokeMethod { get; set; }
+
         public delegate void InvokeMethodDel(IntPtr method, IntPtr target, IntPtr variants, IntPtr result);
     }
 
@@ -60,7 +66,7 @@ namespace Qml.Net.Internal.Types
         void CreateLazyTypeInfo(IntPtr typeInfo);
 
         void LoadTypeInfo(IntPtr typeInfo);
-        
+
         IntPtr InstantiateType(IntPtr type);
 
         void ReadProperty(IntPtr property, IntPtr target, IntPtr indexProperty, IntPtr result);
@@ -74,10 +80,10 @@ namespace Qml.Net.Internal.Types
         bool RaiseNetSignals(IntPtr target, string signalName, IntPtr parameters);
 
         Task AwaitTask(IntPtr target, IntPtr succesCallback, IntPtr failureCallback);
-        
+
         bool Serialize(IntPtr instance, IntPtr result);
     }
-    
+
     internal class CallbacksImpl
     {
         readonly ICallbacks _callbacks;
@@ -94,28 +100,28 @@ namespace Qml.Net.Internal.Types
         RaiseNetSignalsDelegate _raiseNetSignalsDelegate;
         AwaitTaskDelegate _awaitTaskDelegate;
         SerializeDelegate _serializeDelegate;
-        
+
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        delegate bool IsTypeValidDelegate([MarshalAs(UnmanagedType.LPWStr)]string typeName);
-        
+        delegate byte IsTypeValidDelegate([MarshalAs(UnmanagedType.LPWStr)]string typeName);
+
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         delegate void CreateLazyTypeInfoDelegate(IntPtr typeInfo);
-        
+
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         delegate void LoadTypeInfoDelegate(IntPtr typeInfo);
-        
+
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         delegate void ReleaseNetReferenceDelegate(UInt64 objectId);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         delegate void ReleaseNetDelegateGCHandleDelegate(IntPtr handle);
-        
+
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         delegate IntPtr InstantiateTypeDelgate(IntPtr type);
-        
+
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         delegate void ReadPropertyDelegate(IntPtr property, IntPtr target, IntPtr indexParameter, IntPtr result);
-        
+
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         delegate void WritePropertyDelegate(IntPtr property, IntPtr target, IntPtr indexParameter, IntPtr value);
 
@@ -124,20 +130,20 @@ namespace Qml.Net.Internal.Types
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         delegate void GCCollectDelegate(int maxGeneration);
-        
+
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        delegate bool RaiseNetSignalsDelegate(IntPtr target, [MarshalAs(UnmanagedType.LPWStr)]string signalName, IntPtr parameters);
-        
+        delegate byte RaiseNetSignalsDelegate(IntPtr target, [MarshalAs(UnmanagedType.LPWStr)]string signalName, IntPtr parameters);
+
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         delegate void AwaitTaskDelegate(IntPtr target, IntPtr successCallback, IntPtr failureCallback);
-        
+
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        delegate bool SerializeDelegate(IntPtr instance, IntPtr result);
-        
+        delegate byte SerializeDelegate(IntPtr instance, IntPtr result);
+
         public CallbacksImpl(ICallbacks callbacks)
         {
             _callbacks = callbacks;
-            
+
             _isTypeValidDelegate = IsTypeValid;
             GCHandle.Alloc(_isTypeValidDelegate);
 
@@ -152,7 +158,7 @@ namespace Qml.Net.Internal.Types
 
             _loadTypeInfoDelegate = LoadTypeInfo;
             GCHandle.Alloc(_loadTypeInfoDelegate);
-            
+
             _instantiateTypeDelgate = InstantiateType;
             GCHandle.Alloc(_instantiateTypeDelgate);
 
@@ -178,11 +184,11 @@ namespace Qml.Net.Internal.Types
             GCHandle.Alloc(_serializeDelegate);
         }
 
-        private bool IsTypeValid(string typeName)
+        private byte IsTypeValid(string typeName)
         {
-            return _callbacks.IsTypeValid(typeName);
+            return _callbacks.IsTypeValid(typeName) ? (byte)1 : (byte)0;
         }
-        
+
         private void ReleaseNetReference(UInt64 objectId)
         {
             _callbacks.ReleaseNetReference(objectId);
@@ -197,17 +203,17 @@ namespace Qml.Net.Internal.Types
         {
             _callbacks.CreateLazyTypeInfo(type);
         }
-        
+
         private void LoadTypeInfo(IntPtr type)
         {
             _callbacks.LoadTypeInfo(type);
         }
-        
+
         private IntPtr InstantiateType(IntPtr type)
         {
             return _callbacks.InstantiateType(type);
         }
-        
+
         private void ReadProperty(IntPtr property, IntPtr target, IntPtr indexParameter, IntPtr result)
         {
             _callbacks.ReadProperty(property, target, indexParameter, result);
@@ -228,11 +234,12 @@ namespace Qml.Net.Internal.Types
             _callbacks.GCCollect(maxGeneration);
         }
 
-        private bool RaiseNetSignals(IntPtr target,
+        private byte RaiseNetSignals(
+            IntPtr target,
             string signalName,
             IntPtr parameters)
         {
-            return _callbacks.RaiseNetSignals(target, signalName, parameters);
+            return _callbacks.RaiseNetSignals(target, signalName, parameters) ? (byte)1 : (byte)0;
         }
 
         private void AwaitTask(IntPtr target, IntPtr succesCallback, IntPtr failureCallback)
@@ -240,9 +247,9 @@ namespace Qml.Net.Internal.Types
             _callbacks.AwaitTask(target, succesCallback, failureCallback);
         }
 
-        private bool Serialize(IntPtr instance, IntPtr result)
+        private byte Serialize(IntPtr instance, IntPtr result)
         {
-            return _callbacks.Serialize(instance, result);
+            return _callbacks.Serialize(instance, result) ? (byte)1 : (byte)0;
         }
 
         public Callbacks Callbacks()
