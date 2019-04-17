@@ -16,7 +16,7 @@ namespace Qml.Net
         private GCHandle _triggerHandle;
         private GCHandle _aboutToQuitHandle;
         private readonly List<AboutToQuitEventHandler> _aboutToQuitEventHandlers = new List<AboutToQuitEventHandler>();
-        private int _threadId;
+        private static int? _threadId;
 
         protected QCoreApplication(IntPtr handle, bool ownsHandle)
             : base(handle, ownsHandle)
@@ -66,7 +66,18 @@ namespace Qml.Net
             SynchronizationContext.SetSynchronizationContext(new QtSynchronizationContext(this));
         }
 
-        public bool IsMainThread => Environment.CurrentManagedThreadId == _threadId;
+        public static bool IsMainThread
+        {
+            get
+            {
+                if (!_threadId.HasValue)
+                {
+                    throw new Exception("QCoreApplication hasn't been created yet, can't determine what thread is the main thread.");
+                }
+
+                return Environment.CurrentManagedThreadId == _threadId;
+            }
+        }
 
         public int Exec()
         {
@@ -231,6 +242,28 @@ namespace Qml.Net
             }
         }
 
+        public static string OrganizationName
+        {
+            get => Utilities.ContainerToString(Interop.QCoreApplication.GetOrganizationName());
+            set => Interop.QCoreApplication.SetOrganizationName(value);
+        }
+        
+        public static string OrganizationDomain
+        {
+            get => Utilities.ContainerToString(Interop.QCoreApplication.GetOrganizationDomain());
+            set => Interop.QCoreApplication.SetOrganizationDomain(value);
+        }
+
+        public static void SetAttribute(ApplicationAttribute attribute, bool on)
+        {
+            Interop.QCoreApplication.SetAttribute((int)attribute, on);
+        }
+
+        public static bool TestAttribute(ApplicationAttribute attribute)
+        {
+            return Interop.QCoreApplication.TestAttribute((int)attribute) == 1;
+        }
+
         protected override void DisposeUnmanaged(IntPtr ptr)
         {
             SynchronizationContext.SetSynchronizationContext(_oldSynchronizationContext);
@@ -356,5 +389,35 @@ namespace Qml.Net
         public InternalPointerDel InternalPointer { get; set; }
 
         public delegate IntPtr InternalPointerDel(IntPtr app);
+        
+        [NativeSymbol(Entrypoint = "qapp_setOrganizationName")]
+        public SetOrganizationNameDel SetOrganizationName { get; set; }
+        
+        public delegate void SetOrganizationNameDel([MarshalAs(UnmanagedType.LPWStr)]string organizationName);
+        
+        [NativeSymbol(Entrypoint = "qapp_getOrganizationName")]
+        public GetOrganizationNameDel GetOrganizationName { get; set; }
+        
+        public delegate IntPtr GetOrganizationNameDel();
+        
+        [NativeSymbol(Entrypoint = "qapp_setOrganizationDomain")]
+        public SetOrganizationDomainDel SetOrganizationDomain { get; set; }
+        
+        public delegate void SetOrganizationDomainDel([MarshalAs(UnmanagedType.LPWStr)]string organizationDomain);
+        
+        [NativeSymbol(Entrypoint = "qapp_getOrganizationDomain")]
+        public GetOrganizationDomainDel GetOrganizationDomain { get; set; }
+        
+        public delegate IntPtr GetOrganizationDomainDel();
+        
+        [NativeSymbol(Entrypoint = "qapp_setAttribute")]
+        public SetAttributeDel SetAttribute { get; set; }
+        
+        public delegate void SetAttributeDel(int attribute, bool on);
+        
+        [NativeSymbol(Entrypoint = "qapp_testAttribute")]
+        public TestAttributeDel TestAttribute { get; set; }
+        
+        public delegate byte TestAttributeDel(int attribute);
     }
 }

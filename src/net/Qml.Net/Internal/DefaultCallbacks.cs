@@ -94,7 +94,7 @@ namespace Qml.Net.Internal
                     type.HasObjectDestroyed = true;
                 }
 
-                foreach (var methodInfo in typeInfo.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static))
+                foreach (var methodInfo in typeInfo.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly))
                 {
                     if (methodInfo.IsGenericMethod) continue; // No generics supported.
                     if (Helpers.IsPrimitive(methodInfo.DeclaringType)) continue;
@@ -121,7 +121,7 @@ namespace Qml.Net.Internal
 
                 var signals = new Dictionary<string, NetSignalInfo>();
 
-                foreach (var signalAttribute in typeInfo.GetCustomAttributes().OfType<SignalAttribute>())
+                foreach (var signalAttribute in typeInfo.GetCustomAttributes(false).OfType<SignalAttribute>())
                 {
                     if (string.IsNullOrEmpty(signalAttribute.Name))
                     {
@@ -142,7 +142,7 @@ namespace Qml.Net.Internal
                     signals.Add(signal.Name, signal);
                 }
 
-                foreach (var propertyInfo in typeInfo.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+                foreach (var propertyInfo in typeInfo.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly))
                 {
                     if (Helpers.IsPrimitive(propertyInfo.DeclaringType)) continue;
 
@@ -245,12 +245,12 @@ namespace Qml.Net.Internal
                 }
 
                 var result = componentCompelted.ComponentCompleted();
-                if (Tasks.ListenForExceptionsWhenInvokingTasks)
+                if (QmlNetConfig.ListenForExceptionsWhenInvokingTasks)
                 {
                     result?.ContinueWith(
                         task =>
                         {
-                            Tasks.RaiseUnhandledTaskException(task.Exception);
+                            QmlNetConfig.RaiseUnhandledTaskException(task.Exception);
                         },
                         TaskContinuationOptions.OnlyOnFaulted);
                 }
@@ -344,12 +344,12 @@ namespace Qml.Net.Internal
                 Task resultTask = null;
                 del(target, parameters, result, ref resultTask);
 
-                if (Tasks.ListenForExceptionsWhenInvokingTasks)
+                if (QmlNetConfig.ListenForExceptionsWhenInvokingTasks)
                 {
                     resultTask?.ContinueWith(
                         task =>
                         {
-                            Tasks.RaiseUnhandledTaskException(task.Exception);
+                            QmlNetConfig.RaiseUnhandledTaskException(task.Exception);
                         },
                         TaskContinuationOptions.OnlyOnFaulted);
                 }
